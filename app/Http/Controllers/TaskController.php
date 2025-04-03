@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
+use App\Models\TaskUser;
 
 class TaskController extends Controller
 {
     public function index()
     {
-        $tasks = auth()->user()->tasks;
+        $tasks = Task::whereNull('user_id')->with('user')->get();
         return view('dashboard', compact('tasks'));
     }
 
@@ -52,7 +53,7 @@ class TaskController extends Controller
             'solution' => $request->solution,
             'progress' => $request->progress ?? 0,
             'tags' => $request->tags,
-            'user_id' => auth()->id(),
+            'user_id' => null, // Задача не привязана к конкретному пользователю
         ]);
 
         return redirect()->route('admin.dashboard')->with('success', 'Task created successfully.');
@@ -60,10 +61,7 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
-        if (!auth()->user()->is_admin && $task->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
-
+        $task->load('currentUserProgress', 'user');
         return view('tasks.show', compact('task'));
     }
 
@@ -109,5 +107,50 @@ class TaskController extends Controller
     {
         $task->delete();
         return redirect()->route('admin.dashboard')->with('success', 'Task deleted successfully.');
+    }
+
+    // Начать задачу
+public function start(Task $task)
+{
+    // Проверяем, что пользователь авторизован
+    if (!auth()->check()) {
+        return redirect()->route('login')->with('error', 'You must be logged in to start a task.');
+    }
+
+    // Создаём или обновляем запись в task_user
+    $progress = TaskUser::updateOrCreate(
+        ['task_id' => $task->id, 'user_id' => auth()->id()],
+        ['status' => 'in_progress']
+    );
+
+    return redirect()->route('tasks.show', $task)->with('success', 'Task started successfully.');
+}
+
+    public function finish(Request $request, Task $task)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'You must be logged in to finish a task.');
+        }
+
+        $request->validate([
+            'github_link' => 'required|url',
+        ]);
+
+        $progress = TaskUser::where('task_id', $task->id)
+                            ->where('user_id', auth()->id())
+                            ->first();
+
+        if (!$progress) {
+            return redirect()->route('tasks.show', $task)->with('error', 'You must start the task before finishing it.');
+        }
+
+        $progress->update([
+            'status' => 'completed',
+            'github_link' => $request->github_link,
+        ]);
+
+        $task->update(['status' => 'completed']);
+
+        return redirect()->route('tasks.show', $task)->with('success', 'Task finished successfully.');
     }
 }

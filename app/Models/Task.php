@@ -29,4 +29,14 @@ class Task extends Model
         'tags' => 'array',
         'progress' => 'float',
     ];
+    public function userProgress()
+    {
+        return $this->hasMany(TaskUser::class);
+    }
+
+    // Связь с текущим пользователем
+    public function currentUserProgress()
+    {
+        return $this->hasOne(TaskUser::class)->where('user_id', auth()->id());
+    }
 }

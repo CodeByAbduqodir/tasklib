@@ -24,6 +24,7 @@
                                         <td class="border border-gray-300 px-4 py-2">{{ $task->difficulty }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $task->status }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $task->progress }}%</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ $task->user ? $task->user->email : 'Created by Admin' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
                                             <a href="{{ route('tasks.show', $task) }}" class="text-blue-500 hover:underline">View</a>
                                         </td>
