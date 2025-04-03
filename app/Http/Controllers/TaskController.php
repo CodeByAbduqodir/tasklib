@@ -109,22 +109,26 @@ class TaskController extends Controller
         return redirect()->route('admin.dashboard')->with('success', 'Task deleted successfully.');
     }
 
-    // Начать задачу
-public function start(Task $task)
-{
-    // Проверяем, что пользователь авторизован
-    if (!auth()->check()) {
-        return redirect()->route('login')->with('error', 'You must be logged in to start a task.');
+
+    public function start(Task $task)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'You must be logged in to start a task.');
+        }
+
+        $progress = TaskUser::updateOrCreate(
+            ['task_id' => $task->id, 'user_id' => auth()->id()],
+            ['status' => 'in_progress']
+        );
+
+        return redirect()->route('tasks.show', $task)->with('success', 'Task started successfully.');
     }
 
-    // Создаём или обновляем запись в task_user
-    $progress = TaskUser::updateOrCreate(
-        ['task_id' => $task->id, 'user_id' => auth()->id()],
-        ['status' => 'in_progress']
-    );
-
-    return redirect()->route('tasks.show', $task)->with('success', 'Task started successfully.');
-}
+    public function publicIndex()
+    {
+        $tasks = Task::whereNull('user_id')->with('user')->get();
+        return view('tasks.index', compact('tasks'));
+    }
 
     public function finish(Request $request, Task $task)
     {
