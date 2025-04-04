@@ -83,36 +83,36 @@ class TaskController extends Controller
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'title' => 'required|string|max:255',
-        'description' => 'nullable|string',
-        'requirements' => 'nullable|string',
-        'required_knowledge' => 'nullable|string',
-        'resources' => 'nullable|string',
-        'difficulty' => 'required|in:easy,medium,hard',
-        'status' => 'required|in:in_progress,completed',
-        'deadline' => 'nullable|date',
-        'solution' => 'nullable|string',
-        'tags' => 'nullable|array',
-    ]);
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'requirements' => 'nullable|string',
+            'required_knowledge' => 'nullable|string',
+            'resources' => 'nullable|string',
+            'difficulty' => 'required|in:easy,medium,hard',
+            'status' => 'required|in:in_progress,completed',
+            'deadline' => 'nullable|date',
+            'solution' => 'nullable|string',
+            'tags' => 'nullable|array',
+        ]);
 
-    Task::create([
-        'title' => $request->title,
-        'description' => $request->description,
-        'requirements' => $request->requirements,
-        'required_knowledge' => $request->required_knowledge,
-        'resources' => $request->resources,
-        'difficulty' => $request->difficulty,
-        'status' => $request->status,
-        'deadline' => $request->deadline,
-        'solution' => $request->solution,
-        'tags' => $request->tags,
-        'user_id' => null, // Задача не привязана к конкретному пользователю
-    ]);
+        Task::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'requirements' => $request->requirements,
+            'required_knowledge' => $request->required_knowledge,
+            'resources' => $request->resources,
+            'difficulty' => $request->difficulty,
+            'status' => $request->status,
+            'deadline' => $request->deadline,
+            'solution' => $request->solution,
+            'tags' => $request->tags,
+            'user_id' => null, 
+        ]);
 
-    return redirect()->route('admin.dashboard')->with('success', 'Task created successfully.');
-}
+        return redirect()->route('admin.dashboard')->with('success', 'Task created successfully.');
+    }
 
     public function show(Task $task)
     {
