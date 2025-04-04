@@ -8,16 +8,73 @@ use App\Models\TaskUser;
 
 class TaskController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tasks = Task::whereNull('user_id')->with('user')->get();
+        $query = Task::whereNull('user_id')->with('user', 'currentUserProgress');
+
+        if ($request->has('status') && in_array($request->status, ['in_progress', 'completed'])) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('difficulty') && in_array($request->difficulty, ['easy', 'medium', 'hard'])) {
+            $query->where('difficulty', $request->difficulty);
+        }
+
+        $sortBy = $request->input('sort_by', 'title'); // По умолчанию сортировка по названию
+        $sortDirection = $request->input('sort_direction', 'asc'); // По умолчанию по возрастанию
+
+        if (in_array($sortBy, ['title', 'progress'])) {
+            $query->orderBy($sortBy, $sortDirection);
+        }
+
+        $tasks = $query->get();
         return view('dashboard', compact('tasks'));
     }
 
-    public function adminIndex()
+    public function adminIndex(Request $request)
     {
-        $tasks = Task::with('user')->get();
+        $query = Task::with('user', 'currentUserProgress');
+
+        if ($request->has('status') && in_array($request->status, ['in_progress', 'completed'])) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('difficulty') && in_array($request->difficulty, ['easy', 'medium', 'hard'])) {
+            $query->where('difficulty', $request->difficulty);
+        }
+
+        $sortBy = $request->input('sort_by', 'title');
+        $sortDirection = $request->input('sort_direction', 'asc');
+
+        if (in_array($sortBy, ['title', 'progress'])) {
+            $query->orderBy($sortBy, $sortDirection);
+        }
+
+        $tasks = $query->get();
         return view('admin.dashboard', compact('tasks'));
+    }
+
+    public function publicIndex(Request $request)
+    {
+        $query = Task::whereNull('user_id')->with('user');
+
+        if ($request->has('status') && in_array($request->status, ['in_progress', 'completed'])) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('difficulty') && in_array($request->difficulty, ['easy', 'medium', 'hard'])) {
+            $query->where('difficulty', $request->difficulty);
+        }
+
+        $sortBy = $request->input('sort_by', 'title');
+        $sortDirection = $request->input('sort_direction', 'asc');
+
+        if (in_array($sortBy, ['title', 'progress'])) {
+            $query->orderBy($sortBy, $sortDirection);
+        }
+
+        $tasks = $query->get();
+        return view('tasks.index', compact('tasks'));
     }
 
     public function create()
@@ -122,12 +179,6 @@ class TaskController extends Controller
         );
 
         return redirect()->route('tasks.show', $task)->with('success', 'Task started successfully.');
-    }
-
-    public function publicIndex()
-    {
-        $tasks = Task::whereNull('user_id')->with('user')->get();
-        return view('tasks.index', compact('tasks'));
     }
 
     public function finish(Request $request, Task $task)
