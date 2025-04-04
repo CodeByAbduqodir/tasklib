@@ -55,6 +55,7 @@
                         <div class="mb-4">
                             <label for="status" class="block text-gray-600 mb-1">Status</label>
                             <select name="status" id="status" class="w-full p-2 border border-gray-300 rounded-lg" required>
+                                <option value="available" {{ old('status') == 'available' ? 'selected' : '' }}>Available</option>
                                 <option value="in_progress" {{ old('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
                                 <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completed</option>
                             </select>

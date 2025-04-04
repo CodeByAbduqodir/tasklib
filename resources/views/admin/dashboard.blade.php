@@ -16,6 +16,7 @@
                             <label for="status" class="block text-gray-600 mb-1">Status</label>
                             <select name="status" id="status" class="p-2 border border-gray-300 rounded-lg">
                                 <option value="">All</option>
+                                <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Available</option>
                                 <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
                                 <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
                             </select>

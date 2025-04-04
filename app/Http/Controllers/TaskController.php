@@ -12,7 +12,7 @@ class TaskController extends Controller
     {
         $query = Task::whereNull('user_id')->with('user', 'currentUserProgress');
 
-        if ($request->has('status') && in_array($request->status, ['in_progress', 'completed'])) {
+        if ($request->has('status') && in_array($request->status, ['available', 'in_progress', 'completed'])) {
             $query->where('status', $request->status);
         }
 
@@ -35,7 +35,7 @@ class TaskController extends Controller
     {
         $query = Task::with('user', 'currentUserProgress');
 
-        if ($request->has('status') && in_array($request->status, ['in_progress', 'completed'])) {
+        if ($request->has('status') && in_array($request->status, ['available', 'in_progress', 'completed'])) {
             $query->where('status', $request->status);
         }
 
@@ -58,7 +58,7 @@ class TaskController extends Controller
     {
         $query = Task::whereNull('user_id')->with('user');
 
-        if ($request->has('status') && in_array($request->status, ['in_progress', 'completed'])) {
+        if ($request->has('status') && in_array($request->status, ['available', 'in_progress', 'completed'])) {
             $query->where('status', $request->status);
         }
 
@@ -91,7 +91,7 @@ class TaskController extends Controller
             'required_knowledge' => 'nullable|string',
             'resources' => 'nullable|string',
             'difficulty' => 'required|in:easy,medium,hard',
-            'status' => 'required|in:in_progress,completed',
+            'status' => 'required|in:available,in_progress,completed', 
             'deadline' => 'nullable|date',
             'solution' => 'nullable|string',
             'tags' => 'nullable|array',
@@ -167,11 +167,11 @@ class TaskController extends Controller
 
     public function start(Task $task)
     {
-        if (!auth()->check()) {
-            return redirect()->route('login')->with('error', 'You must be logged in to start a task.');
+        if ($task->status === 'available') {
+            $task->update(['status' => 'in_progress']);
         }
 
-        $progress = TaskUser::updateOrCreate(
+        TaskUser::updateOrCreate(
             ['task_id' => $task->id, 'user_id' => auth()->id()],
             ['status' => 'in_progress']
         );
@@ -181,29 +181,27 @@ class TaskController extends Controller
 
     public function finish(Request $request, Task $task)
     {
-        if (!auth()->check()) {
-            return redirect()->route('login')->with('error', 'You must be logged in to finish a task.');
-        }
-
         $request->validate([
             'github_link' => 'required|url',
         ]);
 
         $progress = TaskUser::where('task_id', $task->id)
-                            ->where('user_id', auth()->id())
-                            ->first();
-
-        if (!$progress) {
-            return redirect()->route('tasks.show', $task)->with('error', 'You must start the task before finishing it.');
-        }
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
         $progress->update([
             'status' => 'completed',
             'github_link' => $request->github_link,
         ]);
 
-        $task->update(['status' => 'completed']);
+        $allCompleted = TaskUser::where('task_id', $task->id)
+            ->where('status', '!=', 'completed')
+            ->doesntExist();
 
-        return redirect()->route('tasks.show', $task)->with('success', 'Task finished successfully.');
+        if ($allCompleted) {
+            $task->update(['status' => 'completed']);
+        }
+
+        return redirect()->route('tasks.show', $task)->with('success', 'Task completed successfully.');
     }
 }
