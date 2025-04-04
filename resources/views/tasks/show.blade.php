@@ -11,12 +11,6 @@
                     <p class="mb-2"><strong>Solution:</strong> {{ $task->solution ?? 'N/A' }}</p>
                     <p class="mb-2"><strong>Difficulty:</strong> {{ $task->difficulty }}</p>
                     <p class="mb-2"><strong>Status:</strong> {{ $task->status }}</p>
-                    <p class="mb-2"><strong>Progress:</strong>
-                        <div class="w-full bg-gray-200 rounded-full h-4">
-                            <div class="bg-blue-500 h-4 rounded-full" style="width: {{ $task->progress }}%"></div>
-                        </div>
-                        <span>{{ $task->progress }}%</span>
-                    </p>
                     <p class="mb-2"><strong>Deadline:</strong> {{ $task->deadline ? $task->deadline->format('Y-m-d H:i') : 'N/A' }}</p>
                     <p class="mb-2"><strong>Tags:</strong>
                         @if($task->tags)
@@ -28,7 +22,7 @@
                         @endif
                     </p>
                     <p class="mb-2"><strong>Created by:</strong> {{ $task->user ? $task->user->email : 'Created by Admin' }}</p>
-
+                    
                     @if(auth()->check() && !auth()->user()->is_admin)
                         @php
                             $progress = $task->currentUserProgress;

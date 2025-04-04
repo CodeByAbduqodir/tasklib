@@ -28,7 +28,6 @@
                             <label for="sort_by" class="block text-gray-600 mb-1">Sort By</label>
                             <select name="sort_by" id="sort_by" class="p-2 border border-gray-300 rounded-lg">
                                 <option value="title" {{ request('sort_by') == 'title' ? 'selected' : '' }}>Title</option>
-                                <option value="progress" {{ request('sort_by') == 'progress' ? 'selected' : '' }}>Progress</option>
                             </select>
                         </div>
                         <div>
@@ -52,7 +51,6 @@
                                     <th class="border border-gray-300 px-4 py-2">Title</th>
                                     <th class="border border-gray-300 px-4 py-2">Difficulty</th>
                                     <th class="border border-gray-300 px-4 py-2">Status</th>
-                                    <th class="border border-gray-300 px-4 py-2">Progress</th>
                                     <th class="border border-gray-300 px-4 py-2">User</th>
                                     <th class="border border-gray-300 px-4 py-2">Actions</th>
                                 </tr>
@@ -63,7 +61,6 @@
                                         <td class="border border-gray-300 px-4 py-2">{{ $task->title }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $task->difficulty }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $task->status }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $task->progress }}%</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $task->user ? $task->user->email : 'Created by Admin' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
                                             <a href="{{ route('tasks.show', $task) }}" class="text-blue-500 hover:underline">View</a>

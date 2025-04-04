@@ -20,11 +20,11 @@ class TaskController extends Controller
             $query->where('difficulty', $request->difficulty);
         }
 
-        $sortBy = $request->input('sort_by', 'title'); // По умолчанию сортировка по названию
-        $sortDirection = $request->input('sort_direction', 'asc'); // По умолчанию по возрастанию
+        $sortBy = $request->input('sort_by', 'title');
+        $sortDirection = $request->input('sort_direction', 'asc');
 
-        if (in_array($sortBy, ['title', 'progress'])) {
-            $query->orderBy($sortBy, $sortDirection);
+        if ($sortBy === 'title') {
+            $query->orderBy('title', $sortDirection);
         }
 
         $tasks = $query->get();
@@ -46,8 +46,8 @@ class TaskController extends Controller
         $sortBy = $request->input('sort_by', 'title');
         $sortDirection = $request->input('sort_direction', 'asc');
 
-        if (in_array($sortBy, ['title', 'progress'])) {
-            $query->orderBy($sortBy, $sortDirection);
+        if ($sortBy === 'title') {
+            $query->orderBy('title', $sortDirection);
         }
 
         $tasks = $query->get();
@@ -69,8 +69,8 @@ class TaskController extends Controller
         $sortBy = $request->input('sort_by', 'title');
         $sortDirection = $request->input('sort_direction', 'asc');
 
-        if (in_array($sortBy, ['title', 'progress'])) {
-            $query->orderBy($sortBy, $sortDirection);
+        if ($sortBy === 'title') {
+            $query->orderBy('title', $sortDirection);
         }
 
         $tasks = $query->get();
@@ -83,38 +83,36 @@ class TaskController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'requirements' => 'nullable|string',
-            'required_knowledge' => 'nullable|string',
-            'resources' => 'nullable|string',
-            'difficulty' => 'required|in:easy,medium,hard',
-            'status' => 'required|in:in_progress,completed',
-            'deadline' => 'nullable|date',
-            'solution' => 'nullable|string',
-            'progress' => 'nullable|numeric|min:0|max:100',
-            'tags' => 'nullable|array',
-        ]);
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'requirements' => 'nullable|string',
+        'required_knowledge' => 'nullable|string',
+        'resources' => 'nullable|string',
+        'difficulty' => 'required|in:easy,medium,hard',
+        'status' => 'required|in:in_progress,completed',
+        'deadline' => 'nullable|date',
+        'solution' => 'nullable|string',
+        'tags' => 'nullable|array',
+    ]);
 
-        Task::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'requirements' => $request->requirements,
-            'required_knowledge' => $request->required_knowledge,
-            'resources' => $request->resources,
-            'difficulty' => $request->difficulty,
-            'status' => $request->status,
-            'deadline' => $request->deadline,
-            'solution' => $request->solution,
-            'progress' => $request->progress ?? 0,
-            'tags' => $request->tags,
-            'user_id' => null, // Задача не привязана к конкретному пользователю
-        ]);
+    Task::create([
+        'title' => $request->title,
+        'description' => $request->description,
+        'requirements' => $request->requirements,
+        'required_knowledge' => $request->required_knowledge,
+        'resources' => $request->resources,
+        'difficulty' => $request->difficulty,
+        'status' => $request->status,
+        'deadline' => $request->deadline,
+        'solution' => $request->solution,
+        'tags' => $request->tags,
+        'user_id' => null, // Задача не привязана к конкретному пользователю
+    ]);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Task created successfully.');
-    }
+    return redirect()->route('admin.dashboard')->with('success', 'Task created successfully.');
+}
 
     public function show(Task $task)
     {

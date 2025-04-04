@@ -22,6 +22,27 @@
                             @enderror
                         </div>
                         <div class="mb-4">
+                            <label for="requirements" class="block text-gray-600 mb-1">Requirements</label>
+                            <textarea name="requirements" id="requirements" class="w-full p-2 border border-gray-300 rounded-lg">{{ old('requirements', $task->requirements) }}</textarea>
+                            @error('requirements')
+                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="mb-4">
+                            <label for="required_knowledge" class="block text-gray-600 mb-1">Required Knowledge</label>
+                            <textarea name="required_knowledge" id="required_knowledge" class="w-full p-2 border border-gray-300 rounded-lg">{{ old('required_knowledge', $task->required_knowledge) }}</textarea>
+                            @error('required_knowledge')
+                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="mb-4">
+                            <label for="resources" class="block text-gray-600 mb-1">Resources</label>
+                            <textarea name="resources" id="resources" class="w-full p-2 border border-gray-300 rounded-lg">{{ old('resources', $task->resources) }}</textarea>
+                            @error('resources')
+                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="mb-4">
                             <label for="difficulty" class="block text-gray-600 mb-1">Difficulty</label>
                             <select name="difficulty" id="difficulty" class="w-full p-2 border border-gray-300 rounded-lg" required>
                                 <option value="easy" {{ old('difficulty', $task->difficulty) == 'easy' ? 'selected' : '' }}>Easy</option>
@@ -43,16 +64,23 @@
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="progress" class="block text-gray-600 mb-1">Progress (%)</label>
-                            <input type="number" name="progress" id="progress" value="{{ old('progress', $task->progress) }}" class="w-full p-2 border border-gray-300 rounded-lg" min="0" max="100">
-                            @error('progress')
+                            <label for="deadline" class="block text-gray-600 mb-1">Deadline</label>
+                            <input type="datetime-local" name="deadline" id="deadline" value="{{ old('deadline', $task->deadline ? $task->deadline->format('Y-m-d\TH:i') : '') }}" class="w-full p-2 border border-gray-300 rounded-lg">
+                            @error('deadline')
                                 <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="deadline" class="block text-gray-600 mb-1">Deadline</label>
-                            <input type="datetime-local" name="deadline" id="deadline" value="{{ old('deadline', $task->deadline ? $task->deadline->format('Y-m-d\TH:i') : '') }}" class="w-full p-2 border border-gray-300 rounded-lg">
-                            @error('deadline')
+                            <label for="solution" class="block text-gray-600 mb-1">Solution</label>
+                            <textarea name="solution" id="solution" class="w-full p-2 border border-gray-300 rounded-lg">{{ old('solution', $task->solution) }}</textarea>
+                            @error('solution')
+                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="mb-4">
+                            <label for="tags" class="block text-gray-600 mb-1">Tags (comma separated)</label>
+                            <input type="text" name="tags[]" id="tags" value="{{ old('tags', $task->tags ? implode(',', $task->tags) : '') }}" class="w-full p-2 border border-gray-300 rounded-lg">
+                            @error('tags')
                                 <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
                             @enderror
                         </div>
