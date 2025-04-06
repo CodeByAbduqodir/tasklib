@@ -12,9 +12,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [TaskController::class, 'adminIndex'])->name('admin.dashboard');
 });
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [TaskController::class, 'publicIndex'])->name('home');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

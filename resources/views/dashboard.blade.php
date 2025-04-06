@@ -3,7 +3,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <h1 class="text-2xl font-bold mb-4">Your Tasks</h1>
+                    <h1 class="text-2xl font-bold mb-4">Dashboard - Your Tasks</h1>
 
                     <form method="GET" action="{{ route('dashboard') }}" class="mb-4 flex space-x-4">
                         <div>
@@ -51,7 +51,7 @@
                                     <th class="border border-gray-300 px-4 py-2">Title</th>
                                     <th class="border border-gray-300 px-4 py-2">Difficulty</th>
                                     <th class="border border-gray-300 px-4 py-2">Status</th>
-                                    <th class="border border-gray-300 px-4 py-2">User</th>
+                                    <th class="border border-gray-300 px-4 py-2">Your Status</th>
                                     <th class="border border-gray-300 px-4 py-2">Actions</th>
                                 </tr>
                             </thead>
@@ -61,14 +61,27 @@
                                         <td class="border border-gray-300 px-4 py-2">{{ $task->title }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $task->difficulty }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $task->status }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $task->user ? $task->user->email : 'Created by Admin' }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ $task->currentUserProgress->status ?? 'Not Started' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
                                             <a href="{{ route('tasks.show', $task) }}" class="text-blue-500 hover:underline">View</a>
+                                            @if($task->currentUserProgress && $task->currentUserProgress->status == 'in_progress')
+                                                <form action="{{ route('tasks.finish', $task) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    <input type="text" name="github_link" placeholder="GitHub Link" class="border border-gray-300 p-1 rounded ml-2" required>
+                                                    <button type="submit" class="text-green-500 hover:underline ml-2">Finish</button>
+                                                </form>
+                                            @elseif(!$task->currentUserProgress || $task->currentUserProgress->status == 'not_started')
+                                                <a href="{{ route('tasks.start', $task) }}" class="text-green-500 hover:underline ml-2">Start</a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+
+                        <div class="mt-4">
+                            {{ $tasks->appends(request()->query())->links() }}
+                        </div>
                     @endif
                 </div>
             </div>

@@ -27,7 +27,8 @@ class TaskController extends Controller
             $query->orderBy('title', $sortDirection);
         }
 
-        $tasks = $query->get();
+        $tasks = $query->paginate(10);
+
         return view('dashboard', compact('tasks'));
     }
 
@@ -50,7 +51,8 @@ class TaskController extends Controller
             $query->orderBy('title', $sortDirection);
         }
 
-        $tasks = $query->get();
+        $tasks = $query->paginate(10);
+
         return view('admin.dashboard', compact('tasks'));
     }
 
@@ -73,7 +75,8 @@ class TaskController extends Controller
             $query->orderBy('title', $sortDirection);
         }
 
-        $tasks = $query->get();
+        $tasks = $query->paginate(10);
+
         return view('tasks.index', compact('tasks'));
     }
 
