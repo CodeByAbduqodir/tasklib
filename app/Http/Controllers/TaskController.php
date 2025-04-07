@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
-use Illuminate\Http\Request;
 use App\Models\TaskUser;
+use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
@@ -25,11 +25,29 @@ class TaskController extends Controller
 
         if ($sortBy === 'title') {
             $query->orderBy('title', $sortDirection);
+        } elseif ($sortBy === 'difficulty') {
+            $query->orderByRaw("FIELD(difficulty, 'easy', 'medium', 'hard') " . $sortDirection);
+        } elseif ($sortBy === 'status') {
+            $query->orderByRaw("FIELD(status, 'available', 'in_progress', 'completed') " . $sortDirection);
+        } elseif ($sortBy === 'created_at') {
+            $query->orderBy('created_at', $sortDirection);
         }
 
         $tasks = $query->paginate(10);
 
-        return view('dashboard', compact('tasks'));
+        $totalTasks = Task::whereNull('user_id')->count();
+        $statusCounts = [
+            'available' => Task::whereNull('user_id')->where('status', 'available')->count(),
+            'in_progress' => Task::whereNull('user_id')->where('status', 'in_progress')->count(),
+            'completed' => Task::whereNull('user_id')->where('status', 'completed')->count(),
+        ];
+        $difficultyCounts = [
+            'easy' => Task::whereNull('user_id')->where('difficulty', 'easy')->count(),
+            'medium' => Task::whereNull('user_id')->where('difficulty', 'medium')->count(),
+            'hard' => Task::whereNull('user_id')->where('difficulty', 'hard')->count(),
+        ];
+
+        return view('dashboard', compact('tasks', 'totalTasks', 'statusCounts', 'difficultyCounts'));
     }
 
     public function adminIndex(Request $request)
@@ -49,6 +67,12 @@ class TaskController extends Controller
 
         if ($sortBy === 'title') {
             $query->orderBy('title', $sortDirection);
+        } elseif ($sortBy === 'difficulty') {
+            $query->orderByRaw("FIELD(difficulty, 'easy', 'medium', 'hard') " . $sortDirection);
+        } elseif ($sortBy === 'status') {
+            $query->orderByRaw("FIELD(status, 'available', 'in_progress', 'completed') " . $sortDirection);
+        } elseif ($sortBy === 'created_at') {
+            $query->orderBy('created_at', $sortDirection);
         }
 
         $tasks = $query->paginate(10);
@@ -106,7 +130,7 @@ class TaskController extends Controller
             'required_knowledge' => 'nullable|string',
             'resources' => 'nullable|string',
             'difficulty' => 'required|in:easy,medium,hard',
-            'status' => 'required|in:available,in_progress,completed', 
+            'status' => 'required|in:available,in_progress,completed',
             'deadline' => 'nullable|date',
             'solution' => 'nullable|string',
             'tags' => 'nullable|array',
@@ -123,7 +147,7 @@ class TaskController extends Controller
             'deadline' => $request->deadline,
             'solution' => $request->solution,
             'tags' => $request->tags,
-            'user_id' => null, 
+            'user_id' => null,
         ]);
 
         return redirect()->route('admin.dashboard')->with('success', 'Task created successfully.');

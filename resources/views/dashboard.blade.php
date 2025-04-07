@@ -1,9 +1,61 @@
 <x-app-layout>
-    <div class="py-12">
+    <div class="py-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h1 class="text-3xl font-bold mb-6 fade-in">Dashboard - Your Tasks</h1>
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <div class="mb-6 fade-in">
+                        <h1 class="text-3xl font-bold mb-2">Dashboard - Your Tasks 📋</h1>
+                        <p class="text-lg text-gray-600 dark:text-gray-400">
+                            View and manage your tasks.
+                        </p>
+                    </div>
+
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-tasks mr-2 text-blue-600 dark:text-blue-400"></i>
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Total Tasks</h3>
+                            </div>
+                            <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ $totalTasks ?? 0 }}</p>
+                        </div>
+
+                        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-chart-pie mr-2 text-blue-600 dark:text-blue-400"></i>
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Tasks by Status</h3>
+                            </div>
+                            <div class="space-y-2">
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    Available: <span class="font-bold text-green-600 dark:text-green-400">{{ $statusCounts['available'] ?? 0 }}</span>
+                                </p>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    In Progress: <span class="font-bold text-yellow-600 dark:text-yellow-400">{{ $statusCounts['in_progress'] ?? 0 }}</span>
+                                </p>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    Completed: <span class="font-bold text-blue-600 dark:text-blue-400">{{ $statusCounts['completed'] ?? 0 }}</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-star mr-2 text-blue-600 dark:text-blue-400"></i>
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Tasks by Difficulty</h3>
+                            </div>
+                            <div class="space-y-2">
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    Easy: <span class="font-bold text-green-600 dark:text-green-400">{{ $difficultyCounts['easy'] ?? 0 }}</span>
+                                </p>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    Medium: <span class="font-bold text-orange-600 dark:text-orange-400">{{ $difficultyCounts['medium'] ?? 0 }}</span>
+                                </p>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    Hard: <span class="font-bold text-red-600 dark:text-red-400">{{ $difficultyCounts['hard'] ?? 0 }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
                     <form method="GET" action="{{ route('dashboard') }}" class="mb-6 flex space-x-4">
                         <div class="form-group">
@@ -28,6 +80,9 @@
                             <label for="sort_by" class="form-label">Sort By</label>
                             <select name="sort_by" id="sort_by" class="form-select">
                                 <option value="title" {{ request('sort_by') == 'title' ? 'selected' : '' }}>Title</option>
+                                <option value="difficulty" {{ request('sort_by') == 'difficulty' ? 'selected' : '' }}>Difficulty</option>
+                                <option value="status" {{ request('sort_by') == 'status' ? 'selected' : '' }}>Status</option>
+                                <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Created At</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -49,6 +104,7 @@
                             <table class="min-w-full">
                                 <thead>
                                     <tr>
+                                        <th>#</th>
                                         <th>Title</th>
                                         <th>Difficulty</th>
                                         <th>Status</th>
@@ -59,6 +115,7 @@
                                 <tbody>
                                     @foreach($tasks as $task)
                                         <tr class="fade-in">
+                                            <td>{{ $loop->iteration }}</td>
                                             <td>{{ $task->title }}</td>
                                             <td>
                                                 <span class="difficulty-{{ $task->difficulty }}">
@@ -73,21 +130,19 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <span class="status-{{ $task->currentUserProgress->status ?? 'not_started' }}">
-                                                    <i class="fas fa-circle mr-1 {{ ($task->currentUserProgress->status ?? 'not_started') == 'available' ? 'text-green-500' : (($task->currentUserProgress->status ?? 'not_started') == 'in_progress' ? 'text-yellow-500' : (($task->currentUserProgress->status ?? 'not_started') == 'completed' ? 'text-blue-500' : 'text-gray-500')) }}"></i>
-                                                    {{ $task->currentUserProgress->status ?? 'Not Started' }}
-                                                </span>
+                                                @if($task->currentUserProgress)
+                                                    <span class="status-{{ $task->currentUserProgress->status }}">
+                                                        <i class="fas fa-circle mr-1 {{ $task->currentUserProgress->status == 'in_progress' ? 'text-yellow-500' : 'text-blue-500' }}"></i>
+                                                        {{ $task->currentUserProgress->status }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-gray-500 dark:text-gray-400">Not Started</span>
+                                                @endif
                                             </td>
-                                            <td>
-                                                <a href="{{ route('tasks.show', $task) }}" class="text-blue-500 hover:underline">View</a>
-                                                @if($task->currentUserProgress && $task->currentUserProgress->status == 'in_progress')
-                                                    <form action="{{ route('tasks.finish', $task) }}" method="POST" class="inline">
-                                                        @csrf
-                                                        <input type="text" name="github_link" placeholder="GitHub Link" class="form-input ml-2" required>
-                                                        <button type="submit" class="btn btn-success ml-2">Finish</button>
-                                                    </form>
-                                                @elseif(!$task->currentUserProgress || $task->currentUserProgress->status == 'not_started')
-                                                    <a href="{{ route('tasks.start', $task) }}" class="btn btn-success ml-2">Start</a>
+                                            <td class="flex space-x-2">
+                                                <a href="{{ route('tasks.show', $task) }}" class="btn btn-primary btn-sm">View</a>
+                                                @if(!$task->currentUserProgress || $task->currentUserProgress->status == 'not_started')
+                                                    <a href="{{ route('tasks.start', $task) }}" class="btn btn-success btn-sm">Start</a>
                                                 @endif
                                             </td>
                                         </tr>

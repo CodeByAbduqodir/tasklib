@@ -6,7 +6,6 @@
                     <div class="mb-6 fade-in">
                         <h1 class="text-3xl font-bold mb-2">Welcome to TaskLib! 🚀</h1>
                         <p class="text-lg text-gray-600 dark:text-gray-400">
-                            Explore a variety of tasks to improve your skills. 
                             @auth
                                 Start working on a task now!
                             @else
@@ -16,7 +15,7 @@
                         </p>
                     </div>
 
-                    <form method="GET" action="{{ route('home') }}" class="mb-6 flex space-x-4">
+                    <form method="GET" action="{{ route('dashboard') }}" class="mb-6 flex space-x-4">
                         <div class="form-group">
                             <label for="status" class="form-label">Status</label>
                             <select name="status" id="status" class="form-select">
@@ -39,6 +38,9 @@
                             <label for="sort_by" class="form-label">Sort By</label>
                             <select name="sort_by" id="sort_by" class="form-select">
                                 <option value="title" {{ request('sort_by') == 'title' ? 'selected' : '' }}>Title</option>
+                                <option value="difficulty" {{ request('sort_by') == 'difficulty' ? 'selected' : '' }}>Difficulty</option>
+                                <option value="status" {{ request('sort_by') == 'status' ? 'selected' : '' }}>Status</option>
+                                <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Created At</option>
                             </select>
                         </div>
                         <div class="form-group">
