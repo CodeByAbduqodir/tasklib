@@ -53,7 +53,19 @@ class TaskController extends Controller
 
         $tasks = $query->paginate(10);
 
-        return view('admin.dashboard', compact('tasks'));
+        $totalTasks = Task::count();
+        $statusCounts = [
+            'available' => Task::where('status', 'available')->count(),
+            'in_progress' => Task::where('status', 'in_progress')->count(),
+            'completed' => Task::where('status', 'completed')->count(),
+        ];
+        $difficultyCounts = [
+            'easy' => Task::where('difficulty', 'easy')->count(),
+            'medium' => Task::where('difficulty', 'medium')->count(),
+            'hard' => Task::where('difficulty', 'hard')->count(),
+        ];
+
+        return view('admin.dashboard', compact('tasks', 'totalTasks', 'statusCounts', 'difficultyCounts'));
     }
 
     public function publicIndex(Request $request)
@@ -166,7 +178,6 @@ class TaskController extends Controller
         $task->delete();
         return redirect()->route('admin.dashboard')->with('success', 'Task deleted successfully.');
     }
-
 
     public function start(Task $task)
     {

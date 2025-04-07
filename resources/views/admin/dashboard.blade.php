@@ -1,90 +1,168 @@
 <x-app-layout>
-    <div class="py-12">
+    <div class="py-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h1 class="text-2xl font-bold mb-4">Admin Dashboard - All Tasks</h1>
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <!-- Приветственное сообщение -->
+                    <div class="mb-6 fade-in">
+                        <h1 class="text-3xl font-bold mb-2">Admin Dashboard 🚀</h1>
+                        <p class="text-lg text-gray-600 dark:text-gray-400">
+                            Manage all tasks and view platform statistics.
+                        </p>
+                    </div>
 
+                    <!-- Сообщение об успехе -->
                     @if(session('success'))
-                        <div class="mb-4 p-4 bg-green-100 text-green-800 rounded-lg">
+                        <div class="mb-6 p-4 bg-green-100 text-green-800 rounded-lg fade-in">
                             {{ session('success') }}
                         </div>
                     @endif
 
-                    <a href="{{ route('tasks.create') }}" class="inline-block mb-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create New Task</a>
+                    <!-- Карточки с аналитикой -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                        <!-- Карточка: Всего задач -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-tasks mr-2 text-blue-600 dark:text-blue-400"></i>
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Total Tasks</h3>
+                            </div>
+                            <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ $totalTasks ?? 0 }}</p>
+                        </div>
 
-                    <form method="GET" action="{{ route('admin.dashboard') }}" class="mb-4 flex space-x-4">
-                        <div>
-                            <label for="status" class="block text-gray-600 mb-1">Status</label>
-                            <select name="status" id="status" class="p-2 border border-gray-300 rounded-lg">
+                        <!-- Карточка: Задачи по статусам -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-chart-pie mr-2 text-blue-600 dark:text-blue-400"></i>
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Tasks by Status</h3>
+                            </div>
+                            <div class="space-y-2">
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    Available: <span class="font-bold text-green-600 dark:text-green-400">{{ $statusCounts['available'] ?? 0 }}</span>
+                                </p>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    In Progress: <span class="font-bold text-yellow-600 dark:text-yellow-400">{{ $statusCounts['in_progress'] ?? 0 }}</span>
+                                </p>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    Completed: <span class="font-bold text-blue-600 dark:text-blue-400">{{ $statusCounts['completed'] ?? 0 }}</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Карточка: Задачи по сложности -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-star mr-2 text-blue-600 dark:text-blue-400"></i>
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Tasks by Difficulty</h3>
+                            </div>
+                            <div class="space-y-2">
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    Easy: <span class="font-bold text-green-600 dark:text-green-400">{{ $difficultyCounts['easy'] ?? 0 }}</span>
+                                </p>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    Medium: <span class="font-bold text-orange-600 dark:text-orange-400">{{ $difficultyCounts['medium'] ?? 0 }}</span>
+                                </p>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    Hard: <span class="font-bold text-red-600 dark:text-red-400">{{ $difficultyCounts['hard'] ?? 0 }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Кнопка создания задачи -->
+                    <div class="mb-6 fade-in">
+                        <a href="{{ route('tasks.create') }}" class="btn btn-primary">
+                            {{ __('Create New Task') }}
+                        </a>
+                    </div>
+
+                    <!-- Форма фильтрации -->
+                    <form method="GET" action="{{ route('admin.dashboard') }}" class="mb-6 flex space-x-4">
+                        <div class="form-group">
+                            <label for="status" class="form-label">Status</label>
+                            <select name="status" id="status" class="form-select">
                                 <option value="">All</option>
                                 <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Available</option>
                                 <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
                                 <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
                             </select>
                         </div>
-                        <div>
-                            <label for="difficulty" class="block text-gray-600 mb-1">Difficulty</label>
-                            <select name="difficulty" id="difficulty" class="p-2 border border-gray-300 rounded-lg">
+                        <div class="form-group">
+                            <label for="difficulty" class="form-label">Difficulty</label>
+                            <select name="difficulty" id="difficulty" class="form-select">
                                 <option value="">All</option>
                                 <option value="easy" {{ request('difficulty') == 'easy' ? 'selected' : '' }}>Easy</option>
                                 <option value="medium" {{ request('difficulty') == 'medium' ? 'selected' : '' }}>Medium</option>
                                 <option value="hard" {{ request('difficulty') == 'hard' ? 'selected' : '' }}>Hard</option>
                             </select>
                         </div>
-                        <div>
-                            <label for="sort_by" class="block text-gray-600 mb-1">Sort By</label>
-                            <select name="sort_by" id="sort_by" class="p-2 border border-gray-300 rounded-lg">
+                        <div class="form-group">
+                            <label for="sort_by" class="form-label">Sort By</label>
+                            <select name="sort_by" id="sort_by" class="form-select">
                                 <option value="title" {{ request('sort_by') == 'title' ? 'selected' : '' }}>Title</option>
                             </select>
                         </div>
-                        <div>
-                            <label for="sort_direction" class="block text-gray-600 mb-1">Direction</label>
-                            <select name="sort_direction" id="sort_direction" class="p-2 border border-gray-300 rounded-lg">
+                        <div class="form-group">
+                            <label for="sort_direction" class="form-label">Direction</label>
+                            <select name="sort_direction" id="sort_direction" class="form-select">
                                 <option value="asc" {{ request('sort_direction') == 'asc' ? 'selected' : '' }}>Ascending</option>
                                 <option value="desc" {{ request('sort_direction') == 'desc' ? 'selected' : '' }}>Descending</option>
                             </select>
                         </div>
                         <div class="self-end">
-                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Apply</button>
+                            <button type="submit" class="btn btn-primary">Apply</button>
                         </div>
                     </form>
 
+                    <!-- Таблица задач -->
                     @if($tasks->isEmpty())
-                        <p>No tasks found.</p>
+                        <p class="fade-in">No tasks found.</p>
                     @else
-                        <table class="min-w-full border-collapse border border-gray-300">
-                            <thead>
-                                <tr>
-                                    <th class="border border-gray-300 px-4 py-2">Title</th>
-                                    <th class="border border-gray-300 px-4 py-2">Difficulty</th>
-                                    <th class="border border-gray-300 px-4 py-2">Status</th>
-                                    <th class="border border-gray-300 px-4 py-2">User</th>
-                                    <th class="border border-gray-300 px-4 py-2">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($tasks as $task)
+                        <div class="table-container">
+                            <table class="min-w-full">
+                                <thead>
                                     <tr>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $task->title }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $task->difficulty }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $task->status }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $task->user ? $task->user->email : 'Created by Admin' }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">
-                                            <a href="{{ route('tasks.show', $task) }}" class="text-blue-500 hover:underline">View</a>
-                                            <a href="{{ route('tasks.edit', $task) }}" class="text-green-500 hover:underline ml-2">Edit</a>
-                                            <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-500 hover:underline ml-2" onclick="return confirm('Are you sure?')">Delete</button>
-                                            </form>
-                                        </td>
+                                        <th>#</th>
+                                        <th>Title</th>
+                                        <th>Difficulty</th>
+                                        <th>Status</th>
+                                        <th>User</th>
+                                        <th>Actions</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach($tasks as $task)
+                                        <tr class="fade-in">
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $task->title }}</td>
+                                            <td>
+                                                <span class="difficulty-{{ $task->difficulty }}">
+                                                    <i class="fas fa-star mr-1 {{ $task->difficulty == 'easy' ? 'text-green-500' : ($task->difficulty == 'medium' ? 'text-orange-500' : 'text-red-500') }}"></i>
+                                                    {{ $task->difficulty }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="status-{{ $task->status }}">
+                                                    <i class="fas fa-circle mr-1 {{ $task->status == 'available' ? 'text-green-500' : ($task->status == 'in_progress' ? 'text-yellow-500' : 'text-blue-500') }}"></i>
+                                                    {{ $task->status }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $task->user ? $task->user->email : 'Created by Admin' }}</td>
+                                            <td class="flex space-x-2">
+                                                <a href="{{ route('tasks.show', $task) }}" class="btn btn-primary btn-sm">View</a>
+                                                <a href="{{ route('tasks.edit', $task) }}" class="btn btn-success btn-sm">Edit</a>
+                                                <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
 
-                        <div class="mt-4">
+                        <div class="mt-4 pagination fade-in">
                             {{ $tasks->appends(request()->query())->links() }}
                         </div>
                     @endif
