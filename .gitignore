@@ -1,38 +1,48 @@
-/.phpunit.cache
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
+# 📦 Composer
 /vendor
+
+# ⚙️ Laravel runtime
+/.phpunit.cache
+/.phpunit.result.cache
 .env
 .env.backup
 .env.production
-.phpactor.json
-.phpunit.result.cache
+*.sqlite
+auth.json
+storage/*.key
+storage/*.log
+storage/app/public
+storage/framework/*
+storage/logs/*
+storage/pail
+
+# 📁 Public (builds, storage, vite-hot)
+public/build/
+public/hot
+public/storage
+
+# 🧪 Homestead / Testing / Debugging
 Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
-/auth.json
-/.fleet
-/.idea
-/.nova
-/.vscode
-/.zed
-/vendor
-/node_modules
-/.env
-/storage/*.key
-/public/storage
-/public/hot
-/public/storage
-/storage/*.log
-/storage/logs/*.log
-/Homestead.json
-/Homestead.yaml
-/npm-debug.log
-/yarn-error.log
-/.idea
-*.sqlite
+
+# 🛠️ IDE / Editor / Tool configs
+.phpactor.json
+.fleet/
+.idea/
+.nova/
+.vscode/
+.zed/
+
+# 🧩 Node / Vite
+node_modules/
+resources/js/**/*.js
+resources/css/**/*.css
+
+# 🐳 Docker
+docker-compose.override.yml
+docker-compose.yml.backup
+*.env.docker
+.docker/
+docker/

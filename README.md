@@ -93,7 +93,7 @@ Follow these steps to set up and run the project locally.
    ```
 
 6. **Run Migrations**:
-   - Create a database named `task_management` in MySQL.
+   - Create a database named `tasklib` in MySQL.
    - Run migrations to set up the database tables:
      ```bash
      php artisan migrate
